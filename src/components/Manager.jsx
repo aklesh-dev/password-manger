@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -64,8 +65,8 @@ const Manager = () => {
                 draggable: true,
                 progress: undefined,
                 theme: "light",
-                
-                });
+
+            });
         } catch (error) {
             console.error('Failed to copy: ', error);
         }
@@ -87,8 +88,8 @@ const Manager = () => {
                 draggable
                 pauseOnHover
                 theme="light"
-                transition = "Bounce"/>
-                {/* Same as */}
+                transition="Bounce" />
+            {/* Same as */}
             <ToastContainer />
 
             <div className="absolute top-0 z-[-2] h-screen w-screen rotate-180 transform bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]"></div>
@@ -117,7 +118,7 @@ const Manager = () => {
                         trigger="hover"
                     >
                     </lord-icon>
-                        Add Password
+                        Save Password
                     </button>
                 </div>
                 {/* --Display data-- */}
@@ -131,6 +132,7 @@ const Manager = () => {
                                     <th>Site</th>
                                     <th>Username</th>
                                     <th>Password</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody className='bg-green-100'>
@@ -177,6 +179,26 @@ const Manager = () => {
                                                         </lord-icon>
                                                     </div>
                                                 </div>
+                                            </td>
+                                            <td className='w-32 text-center py-2 border border-white'>
+                                                <div className='flex gap-4 justify-center'>
+                                                    <span className="cursor-pointer">
+                                                        <lord-icon
+                                                            src="https://cdn.lordicon.com/ylvuooxd.json"
+                                                            trigger="hover"
+                                                            style={{ "width": "25px", "height": "25px" }}>
+                                                        </lord-icon>
+                                                    </span>
+                                                    {/* --delete icon--- */}
+                                                    <span className="cursor-pointer">
+                                                        <lord-icon
+                                                            src="https://cdn.lordicon.com/hjbrplwk.json"
+                                                            trigger="hover"
+                                                            style={{ "width": "25px", "height": "25px" }}>
+                                                        </lord-icon>
+                                                    </span>
+                                                </div>
+
                                             </td>
                                         </tr>
                                     )
