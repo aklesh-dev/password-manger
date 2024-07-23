@@ -26,7 +26,7 @@ const Manager = () => {
     }, []);
 
 
-    // toggle the visibility icon
+    // --toggle the visibility icon
     const showPassword = () => {
         // alert('show the password !!');
         passwordRef.current.type = 'text';
@@ -42,30 +42,57 @@ const Manager = () => {
     };
 
     const savePassword = () => {
-        setPasswordArray([...passwordArray, form]);
-        localStorage.setItem("passwords", JSON.stringify([...passwordArray, form]));
-        console.log([...passwordArray, form]);
+        setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+        localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]));
+        // console.log([...passwordArray, form]);
+        // --clear the form--
+        setForm({ site: "", username: "", password: "" });
+        toast.success('Password Saved!');
+
     };
+
+    const deletePassword = (id) => {
+        console.log('deleting password with id', id);
+
+        let c = confirm('Do you really want to delete this password');
+        if (c) {
+            // --remove the password from the list  
+            setPasswordArray(passwordArray.filter((item) => item.id !== id));
+            // --remove the password from the localstorage.
+            localStorage.setItem("passwords", JSON.stringify(passwordArray.filter((item) => item.id !== id)));
+            toast('Password Deleted!');
+        }
+
+    };
+
+    const editPassword = (id) => {
+        console.log('editing password with id', id);
+        // --refill the form input
+        setForm(passwordArray.filter(item => item.id === id)[0]);
+        // --remove the password array form the list
+        setPasswordArray(passwordArray.filter(item => item.id !== id));
+
+    };
+
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value })
     }
 
-    // copy text
+    // --copy text to clipboard--
     const copyText = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
             // console.log('Copied the text: ' + text);
             toast('👌 Copied to clipboard!', {
-                position: "top-right",
-                autoClose: 5000,
+                position: "top-center",
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-                theme: "light",
-
+                theme: "dark",
             });
         } catch (error) {
             console.error('Failed to copy: ', error);
@@ -77,7 +104,7 @@ const Manager = () => {
 
     return (
         <>
-            <ToastContainer
+            {/* <ToastContainer
                 position="top-right"
                 autoClose={5000}
                 hideProgressBar={false}
@@ -88,13 +115,13 @@ const Manager = () => {
                 draggable
                 pauseOnHover
                 theme="light"
-                transition="Bounce" />
-            {/* Same as */}
-            <ToastContainer />
+                transition="Bounce"
+                /> */}
+        
 
             <div className="absolute top-0 z-[-2] h-screen w-screen rotate-180 transform bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]"></div>
 
-            <div className=" max-w-4xl text-white mx-auto b-slate-400 p-4 rounded-3xl">
+            <div className="md:my-container">
                 <h1 className='font-bold text-4xl text-center text-green-400'>
                     <span className='text-green-700'>&lt;</span>
                     Pass
@@ -182,7 +209,8 @@ const Manager = () => {
                                             </td>
                                             <td className='w-32 text-center py-2 border border-white'>
                                                 <div className='flex gap-4 justify-center'>
-                                                    <span className="cursor-pointer">
+                                                    {/* --edit icon-- */}
+                                                    <span className="cursor-pointer" onClick={() => editPassword(item.id)}>
                                                         <lord-icon
                                                             src="https://cdn.lordicon.com/ylvuooxd.json"
                                                             trigger="hover"
@@ -190,7 +218,7 @@ const Manager = () => {
                                                         </lord-icon>
                                                     </span>
                                                     {/* --delete icon--- */}
-                                                    <span className="cursor-pointer">
+                                                    <span className="cursor-pointer" onClick={() => deletePassword(item.id)}>
                                                         <lord-icon
                                                             src="https://cdn.lordicon.com/hjbrplwk.json"
                                                             trigger="hover"
