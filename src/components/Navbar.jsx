@@ -2,7 +2,7 @@ import React from 'react'
 
 const Navbar = () => {
   return (
-    <nav className='flex justify-between items-center text-white bg-purple-400 px-32 h-14'>
+    <nav className='flex justify-between items-center text-white bg-purple-400 md:px-32 px-10 h-14 '>
       <div className='logo font-bold text-2xl'>
         <span className='text-green-700'>&lt;</span>
         Pass
@@ -18,7 +18,7 @@ const Navbar = () => {
 
       <button className='bg-green-700 rounded-xl hover:bg-green-800 transition-all delay-75 ease-in-out flex  items-center p-1 text-white'>
         <img className='w-5 h-5 bg-white rounded-full' src="./icons/github.svg" alt="github icon" />
-        <a className='px-4 py-1' href='#'>GitHub</a>
+        <a className='px-4 py-1' href='https://github.com/aklesh-dev/password-manger' target='_blank'>GitHub</a>
       </button>
 
     </nav>

@@ -42,12 +42,17 @@ const Manager = () => {
     };
 
     const savePassword = () => {
-        setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
-        localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]));
-        // console.log([...passwordArray, form]);
-        // --clear the form--
-        setForm({ site: "", username: "", password: "" });
-        toast.success('Password Saved!');
+        if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
+            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
+            localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]));
+            // console.log([...passwordArray, form]);
+            // --clear the form--
+            setForm({ site: "", username: "", password: "" });
+            toast.success('Password Saved!');
+        }
+        else {
+            toast.error('Please fill all the fields!');
+        }
 
     };
 
@@ -117,7 +122,7 @@ const Manager = () => {
                 theme="light"
                 transition="Bounce"
                 /> */}
-        
+
 
             <div className="absolute top-0 z-[-2] h-screen w-screen rotate-180 transform bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]"></div>
 
@@ -130,7 +135,7 @@ const Manager = () => {
                 <p className='text-green-900 font-bold text-center text-lg'>Your own Password Manager</p>
                 <div className="flex flex-col items-center gap-8 text-black">
                     <input value={form.site} onChange={handleChange} placeholder='Enter Website URL' className='px-4 py-1 rounded-full border border-green-400 w-full focus:outline-none focus:border-green-600' type="text" name="site" id="" />
-                    <div className='flex gap-4 w-full'>
+                    <div className='flex flex-col md:flex-row gap-4 w-full'>
                         <input value={form.username} onChange={handleChange} placeholder='Enter Username' className='px-4 py-1 rounded-full border border-green-400 w-full focus:outline-none focus:border-green-600' type="text" name="username" id="" />
                         <div className="relative w-full">
                             <input ref={passwordRef} value={form.password} onChange={handleChange} placeholder='Enter Password' className='px-4 py-1 rounded-full border border-green-400 w-full focus:outline-none focus:border-green-600' type="password" name="password" id="" />
@@ -152,7 +157,7 @@ const Manager = () => {
                 <div className="password text-black">
                     <h2 className='font-bold text-xl py-3'>Your Passwords</h2>
                     {passwordArray.length === 0 && <>NO Password To Show</>}
-                    {passwordArray.length != 0 &&
+                    {passwordArray.length != 0 && <div className='overflow-x-auto'>
                         <table className="table-auto w-full rounded-md overflow-hidden">
                             <thead className='bg-green-800 text-white'>
                                 <tr>
@@ -234,6 +239,9 @@ const Manager = () => {
 
                             </tbody>
                         </table>
+                    </div>
+
+
                     }
                 </div>
 
