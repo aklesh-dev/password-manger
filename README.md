@@ -10,4 +10,5 @@
 - Secure Storage: Passwords are stored securely in local storage.
 - Password Visibility Toggle: Users can toggle the visibility of passwords for added security.
 - Toast Notifications: The application displays toast notifications for successful password saves, edits, and deletions.
+- Pagination: The application uses pagination to display a limited number of passwords per page, making it easier to navigate and manage a large number of passwords.
 - Simple and Intuitive Interface: The application has a simple and easy-to-use interface for managing passwords.
