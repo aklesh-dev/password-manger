@@ -17,6 +17,9 @@ const Manager = () => {
 
     const [passwordArray, setPasswordArray] = useState([]);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
     useEffect(() => {
         let passwords = localStorage.getItem("passwords");
         if (passwords) {
@@ -104,8 +107,19 @@ const Manager = () => {
         }
     };
 
+    // handle page change
+    const handlePageChange = (pageNum) => {
+        setCurrentPage(pageNum);
+    };
 
-
+    // --Determine the index of the last item on the current page
+    const indexOfLastItem = currentPage * itemsPerPage;
+    // --Determine the index of the first item on the current page
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    // --Slice the passwordArray to get only the items for the current page
+    const currentItems = passwordArray.slice(indexOfFirstItem, indexOfLastItem);
+    // --Calculate the total number of pages needed
+    const totalPages = Math.ceil(passwordArray.length / itemsPerPage);
 
     return (
         <>
@@ -168,7 +182,7 @@ const Manager = () => {
                                 </tr>
                             </thead>
                             <tbody className='bg-green-100'>
-                                {passwordArray.map((item, index) => {
+                                {currentItems.map((item, index) => {
                                     return (
                                         <tr key={index} className=''>
                                             <td className='w-32 text-center py-2 border border-white'>
@@ -240,8 +254,21 @@ const Manager = () => {
                             </tbody>
                         </table>
                     </div>
+                    }
 
-
+                    {/* -- pagination btn-- */}
+                    {
+                        totalPages > 1 && <div className='flex justify-center gap-1 mt-1'>
+                            {
+                                Array.from({ length: totalPages }, (_, index) => {
+                                    return <button
+                                        key={index + 1}
+                                        onClick={() => handlePageChange(index + 1)}
+                                        className={`px-3 py-1 rounded-md ${currentPage === index + 1 ? 'bg-green-400 text-white' : 'bg-gray-500'}`}
+                                    >{index + 1}</button>
+                                })
+                            }
+                        </div>
                     }
                 </div>
 
