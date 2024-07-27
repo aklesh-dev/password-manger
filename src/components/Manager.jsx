@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-
 import 'react-toastify/dist/ReactToastify.css';
+
+import { fetchPasswords, createPasswords, updatePasswords, deletePasswords } from '../api';
 
 const Manager = () => {
 
@@ -18,19 +19,33 @@ const Manager = () => {
     const [passwordArray, setPasswordArray] = useState([]);
 
     useEffect(() => {
-        let passwords = localStorage.getItem("passwords");
-        if (passwords) {
-            setPasswordArray(JSON.parse(passwords));
-        }
+        // fetchPasswords()
+        //     .then((response) => {
+        //         setPasswordArray(response.data);
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error fetching passwords',error);
+        //     });
+
+
+        const getPasswords = async () => {
+            try {
+                const { data } = await fetchPasswords();
+                setPasswordArray(data);
+            } catch (error) {
+                console.error('Error fetching passwords', error);
+            }
+        };
+        getPasswords();
 
     }, []);
 
 
     // --toggle the visibility icon
     const showPassword = () => {
-        // alert('show the password !!');
+
         passwordRef.current.type = 'text';
-        // console.log(ref.current.src);
+
         if (ref.current.src.includes("icons/eyecross.png")) {
             ref.current.src = './icons/eye.png';
             passwordRef.current.type = 'password';
@@ -41,41 +56,63 @@ const Manager = () => {
 
     };
 
-    const savePassword = () => {
+    const savePassword = async () => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
-            setPasswordArray([...passwordArray, { ...form, id: uuidv4() }]);
-            localStorage.setItem("passwords", JSON.stringify([...passwordArray, { ...form, id: uuidv4() }]));
-            // console.log([...passwordArray, form]);
-            // --clear the form--
-            setForm({ site: "", username: "", password: "" });
-            toast.success('Password Saved!');
+            try {
+                const newPassword = await createPasswords(form);                
+                setPasswordArray([...passwordArray, newPassword.data]); 
+                // --clear the form--
+                setForm({ site: "", username: "", password: "" });
+                toast.success('Password Saved!');
+
+            } catch (err) {
+                console.error('Error saving password', err);
+                toast.error('Error saving password');
+            }
         }
         else {
             toast.error('Please fill all the fields!');
         }
-
     };
 
-    const deletePassword = (id) => {
+    const handleDeletePassword = async (id) => {
         console.log('deleting password with id', id);
 
-        let c = confirm('Do you really want to delete this password');
-        if (c) {
-            // --remove the password from the list  
-            setPasswordArray(passwordArray.filter((item) => item.id !== id));
-            // --remove the password from the localstorage.
-            localStorage.setItem("passwords", JSON.stringify(passwordArray.filter((item) => item.id !== id)));
-            toast('Password Deleted!');
+        let confirmDelete = confirm('Do you really want to delete this password');
+        if (confirmDelete) {
+            try {
+                await deletePasswords(id);
+                setPasswordArray(passwordArray.filter((password) => password._id !== id));
+                toast.success('Password deleted!');
+            } catch (error) {
+                console.error('Error deleting password', error);
+                toast.error('Failed to delete password');                
+            }           
         }
-
     };
 
     const editPassword = (id) => {
         console.log('editing password with id', id);
+        // --Ensuring to get a valid password object by id
+        const passwordToEdit = passwordArray.find(item => item.id === id);
+
+        if (passwordToEdit) {
+            // --Set form with selected password's details
+            setForm({
+                site: passwordToEdit.site,
+                username: passwordToEdit.username,
+                password: passwordToEdit.password
+            });
+            // --Remove the edited password from the list
+            setPasswordArray(passwordArray.filter(item => item.id !== id));
+        }else{
+            console.error('Password not found for Id:', id);
+            toast.error('Password not found!');
+        }
         // --refill the form input
-        setForm(passwordArray.filter(item => item.id === id)[0]);
+        // setForm(passwordArray.filter(item => item.id === id)[0]);
         // --remove the password array form the list
-        setPasswordArray(passwordArray.filter(item => item.id !== id));
+        // setPasswordArray(passwordArray.filter(item => item.id !== id));
 
     };
 
@@ -109,7 +146,7 @@ const Manager = () => {
 
     return (
         <>
-           
+
             <div className="absolute top-0 z-[-2] h-screen w-screen rotate-180 transform bg-white bg-[radial-gradient(60%_120%_at_50%_50%,hsla(0,0%,100%,0)_0,rgba(252,205,238,.5)_100%)]"></div>
 
             <div className="md:my-container">
@@ -209,7 +246,7 @@ const Manager = () => {
                                                         </lord-icon>
                                                     </span>
                                                     {/* --delete icon--- */}
-                                                    <span className="cursor-pointer" onClick={() => deletePassword(item.id)}>
+                                                    <span className="cursor-pointer" onClick={() => handleDeletePassword(item._id)}>
                                                         <lord-icon
                                                             src="https://cdn.lordicon.com/hjbrplwk.json"
                                                             trigger="hover"
