@@ -17,6 +17,7 @@ const Manager = () => {
     });
 
     const [passwordArray, setPasswordArray] = useState([]);
+    const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
         // fetchPasswords()
@@ -59,11 +60,23 @@ const Manager = () => {
     const savePassword = async () => {
         if (form.site.length > 3 && form.username.length > 3 && form.password.length > 3) {
             try {
-                const newPassword = await createPasswords(form);                
-                setPasswordArray([...passwordArray, newPassword.data]); 
-                // --clear the form--
-                setForm({ site: "", username: "", password: "" });
-                toast.success('Password Saved!');
+                if (editingId) {
+                    // --Update the existing password
+                    const updatePassword = await updatePasswords(editingId, form);
+                    setPasswordArray(passwordArray.map((item)=> item._id === editingId ? updatePassword.data : item));
+                    // --Clear the editing ID
+                    setEditingId(null);
+                    // --Clear the form
+                    setForm({ site: '', username: '', password: '' });
+                    toast.success('Password Updated');
+                } else {
+                    // --Create a new password
+                    const newPassword = await createPasswords(form);
+                    setPasswordArray([...passwordArray, newPassword.data]);
+                    // --clear the form--
+                    setForm({ site: "", username: "", password: "" });
+                    toast.success('Password Saved!');
+                }
 
             } catch (err) {
                 console.error('Error saving password', err);
@@ -86,15 +99,15 @@ const Manager = () => {
                 toast.success('Password deleted!');
             } catch (error) {
                 console.error('Error deleting password', error);
-                toast.error('Failed to delete password');                
-            }           
+                toast.error('Failed to delete password');
+            }
         }
     };
 
     const editPassword = (id) => {
         console.log('editing password with id', id);
         // --Ensuring to get a valid password object by id
-        const passwordToEdit = passwordArray.find(item => item.id === id);
+        const passwordToEdit = passwordArray.find(item => item.id === id || item._id === id);
 
         if (passwordToEdit) {
             // --Set form with selected password's details
@@ -103,17 +116,14 @@ const Manager = () => {
                 username: passwordToEdit.username,
                 password: passwordToEdit.password
             });
-            // --Remove the edited password from the list
-            setPasswordArray(passwordArray.filter(item => item.id !== id));
-        }else{
+            // --Set the id of the password to be edited
+            setEditingId(id);
+            
+        } else {
             console.error('Password not found for Id:', id);
             toast.error('Password not found!');
         }
-        // --refill the form input
-        // setForm(passwordArray.filter(item => item.id === id)[0]);
-        // --remove the password array form the list
-        // setPasswordArray(passwordArray.filter(item => item.id !== id));
-
+        
     };
 
 
@@ -238,7 +248,7 @@ const Manager = () => {
                                             <td className='w-32 text-center py-2 border border-white'>
                                                 <div className='flex gap-4 justify-center'>
                                                     {/* --edit icon-- */}
-                                                    <span className="cursor-pointer" onClick={() => editPassword(item.id)}>
+                                                    <span className="cursor-pointer" onClick={() => editPassword(item.id || item._id)}>
                                                         <lord-icon
                                                             src="https://cdn.lordicon.com/ylvuooxd.json"
                                                             trigger="hover"
