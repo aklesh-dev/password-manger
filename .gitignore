@@ -1,2 +1,2 @@
-echo "passo" >> .gitignore
+echo "passop" >> .gitignore
 git rm -r --cached passop
